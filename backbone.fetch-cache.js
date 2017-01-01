@@ -1,6 +1,6 @@
 /*!
-  backbone.fetch-cache v1.4.1
-  by Andy Appleton - https://github.com/mrappleton/backbone-fetch-cache.git
+ backbone.fetch-cache v2.0.1 - jez500 fork
+ by Andy Appleton - https://github.com/mrappleton/backbone-fetch-cache.git
  */
 
 // AMD wrapper from https://github.com/umdjs/umd/blob/master/amdWebGlobal.js
@@ -156,7 +156,7 @@
     delete Backbone.fetchCache._cache[key];
     Backbone.fetchCache.setLocalStorage();
   }
-  
+
   function reset() {
     // Clearing all cache items
     Backbone.fetchCache._cache = {};
@@ -252,14 +252,16 @@
 
     // Delegate to the actual fetch method and store the attributes in the cache
     var jqXHR = superMethods.modelFetch.apply(this, arguments);
-    // resolve the returned promise when the AJAX call completes
-    jqXHR.done( _.bind(deferred.resolve, context, this) )
-      // Set the new data in the cache
-      .done( _.bind(Backbone.fetchCache.setCache, null, this, opts) )
-      // Reject the promise on fail
-      .fail( _.bind(deferred.reject, context, this) );
+    if (typeof jqXHR !== 'undefined') {
+      // resolve the returned promise when the AJAX call completes
+      jqXHR.done(_.bind(deferred.resolve, context, this))
+          // Set the new data in the cache
+          .done(_.bind(Backbone.fetchCache.setCache, null, this, opts))
+          // Reject the promise on fail
+          .fail(_.bind(deferred.reject, context, this));
 
-    deferred.abort = jqXHR.abort;
+      deferred.abort = jqXHR.abort;
+    }
 
     // return a promise which provides the same methods as a jqXHR object
     return deferred.promise();
@@ -354,14 +356,16 @@
 
     // Delegate to the actual fetch method and store the attributes in the cache
     var jqXHR = superMethods.collectionFetch.apply(this, arguments);
-    // resolve the returned promise when the AJAX call completes
-    jqXHR.done( _.bind(deferred.resolve, context, this) )
-      // Set the new data in the cache
-      .done( _.bind(Backbone.fetchCache.setCache, null, this, opts) )
-      // Reject the promise on fail
-      .fail( _.bind(deferred.reject, context, this) );
+    if (typeof jqXHR !== 'undefined') {
+      // resolve the returned promise when the AJAX call completes
+      jqXHR.done( _.bind(deferred.resolve, context, this) )
+          // Set the new data in the cache
+          .done( _.bind(Backbone.fetchCache.setCache, null, this, opts) )
+          // Reject the promise on fail
+          .fail( _.bind(deferred.reject, context, this) );
 
-    deferred.abort = jqXHR.abort;
+      deferred.abort = jqXHR.abort;
+    }
 
     // return a promise which provides the same methods as a jqXHR object
     return deferred.promise();
